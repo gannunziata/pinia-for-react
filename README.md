@@ -1,26 +1,31 @@
 # pinia-for-react
 
-```
-一个跟vue pinia类似的react状态管理 
-```
-## 1.特点
-```
-1.可以直接在组件外部修改状态（解决目前大多数状态库不能在外部使用的问题）
-2.状态分类管理(按模块拆分)
-3.天然异步支持
-4.开箱即用 无需provider根组件包裹
-5.友好的typescript提示
-```
-## 2.使用
+A react state manager similar to vue Pinia.
 
-```
+## 1. Feature
+
+1. You can modify the state directly outside the component (solving the problem that most current state libraries cannot be used externally)
+2. State classification management (split by module)
+3. Natural asynchronous support
+4. Ready to use without provider root component wrapping
+5. Friendly typescript prompt
+
+## 2. Usage
+
+```sh
 npm i pinia-for-react
+```
+
 or
+
+```sh
 yarn add pinia-for-react
 ```
 
-## 3.示例代码
-### 1.全局普通store
+## 3. Sample Code
+
+### 1. Global normal store
+
 ```tsx
 import {defineStore} from "pinia-for-react";
 
@@ -35,13 +40,13 @@ const userStore = defineStore({
     actions: {
         setUserInfo(userInfo) {
             const state = this.$getState();
-            //可以访问内部提供的方法
+            // Can access internal methods
             this.$setState({
                 ...state,
                 ...userInfo
             })
         },
-        //异步调用
+        // Asynchronous calls
         async syncUserInfo() {
             await new Promise(resolve => setTimeout(resolve, 2000));
             this.$patch({
@@ -56,16 +61,16 @@ const userStore = defineStore({
     }
 });
 
-//满足hook以use开头规范
+// Satisfy the hook specification starting with use
 const useUserStore = userStore;
 
-//外部更新状态
+// External update status
 setInterval(() => {
-    userStore.setUserInfo({username: '我是来自组件外部更改的状态', username1: new Date().getTime()})
+    userStore.setUserInfo({username: 'I am state that is changed from outside the component', username1: new Date().getTime()})
 }, 3000)
 
 const ComponentA = () => {
-    // 直接调用返回值
+    // Directly call the return value
     const [{username}] = useUserStore();
     return (
         <div>
@@ -78,7 +83,7 @@ const ComponentA = () => {
 }
 
 const ComponentB = () => {
-    //也可以直接使用useStore方法hook
+    // You can also use the useStore method hook directly
     const [userInfo, actions] = userStore.useStore();
     return (
         <div>
@@ -111,20 +116,22 @@ export default () => {
             <ComponentA/>
             <ComponentB/>
             <ComponentC/>
-            {/*也可以直接调用返回的userStore变量的方法*/}
+            {/* You can also directly call the method of the returned userStore variable */}
             <button onClick={() => userStore.$reset()}>
-                状态重置
+               Status reset
             </button>
-            {/*也可以直接调用返回的userStore变量的方法*/}
+            {/* You can also directly call the method of the returned userStore variable */}
             <button onClick={() => userStore.$patch({username: '$patch username'})}>
-                $patch 更改局部状态
+                $patch Changing local state
             </button>
         </div>
     )
 }
 
 ```
-### 2.全局代理store
+
+### 2. Global proxy store
+
 ```tsx
 import {defineProxyStore} from "pinia-for-react";
 
@@ -153,12 +160,13 @@ const useUserProxyStore = defineProxyStore({
         }
     }
 });
-//外部调用
+// External calls
 useUserProxyStore.state.username = 'xxxxxx'
 
 export default useUserProxyStore
 
 ```
+
 ```tsx
 import React from 'react'
 import useUserProxyStore from '/@/stores/user-proxy'
@@ -167,16 +175,16 @@ import {Button, Card, Space} from 'antd'
 import './index.css';
 
 const ComponentA = () => {
-    //解构后set值无效，但任然可以拿到最新的store
+    // After deconstruction, the set value is invalid, but the latest store can still be obtained
     const [{username}, {setUserInfo}] = useUserProxyStore();
-    console.log('刷新ComponentA')
+    console.log('Refresh ComponentA')
     return (
         <Card>
             <div>
                 {username}
             </div>
             <Button onClick={() => setUserInfo({Component: 'ComponentA', username: new Date().getTime()})}>
-                ComponentA修改状态
+                ComponentA modifies the state
             </Button>
         </Card>
     )
@@ -184,7 +192,7 @@ const ComponentA = () => {
 
 const ComponentB = () => {
     const [userInfo, {setUserInfo}] = useUserProxyStore.useStore();
-    console.log('刷新ComponentB')
+    console.log('Refresh ComponentB')
     return (
         <Card>
             <div>
@@ -201,7 +209,7 @@ let count = 0;
 
 const ComponentC = () => {
     const [userInfo, actions] = useUserProxyStore.useStore();
-    console.log('刷新ComponentC'+(++count))
+    console.log('Refresh ComponentC '+(++count))
     return (
         <Card>
             <div>
@@ -213,7 +221,6 @@ const ComponentC = () => {
         </Card>
     )
 }
-
 
 export default () => {
 
@@ -241,18 +248,18 @@ export default () => {
                 </Space>
                 <Space>
                     <Button onClick={() => useUserProxyStore.$reset()}>
-                        状态重置
+                       Status reset
                     </Button>
                     <Button onClick={continuityUpdate}>
-                        连续更新状态10次
+                        Update status 10 times in a row
                     </Button>
                     <Button onClick={() => state.username = new Date().getTime()+''}>
-                        $patch 更改局部状态
+                        $patch Changing local state
                     </Button>
                     <Button onClick={() => useUserProxyStore.syncUserInfo()}>
-                        异步更改状态
+                        Changing state asynchronously
                     </Button>
-                    <Button type="primary" onClick={() => navigate('/home')}>跳转到Home页面</Button>
+                    <Button type="primary" onClick={() => navigate('/home')}>Jump to Home page</Button>
                 </Space>
             </Space>
         </div>
@@ -261,14 +268,17 @@ export default () => {
 
 ```
 
-## 4.运行示例
-#### 1.安装依赖
+## 4. Running the Example
+
+#### 1. Install Dependencies
+
 `yarn & npm run install`
-#### 2.运行web或者taro
+
+#### 2. Run web or taro
+
 `yarn run start:web` 
+
 or
+
 `yarn run start:taro` 
-
-
-
 
